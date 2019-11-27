@@ -14,12 +14,14 @@ public class gameScene implements Screen {
     private Vector3 pos;
 
     private Texture img;
-    private float iw = 0;
-    private float ih = 0;
+    private float imgWidth = 0;
+    private float imgHeight = 0;
     private float imgPosX = 0;
     private float imgPosY = 0;
 
     FirstGdxGame game;
+
+    private int stillTouching = 0;
 
     public gameScene(FirstGdxGame game){
         this.game = game;
@@ -33,23 +35,30 @@ public class gameScene implements Screen {
         cam.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         pos = new Vector3(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2, 0);
 
-        iw = img.getWidth();
-        ih = img.getHeight();
+        imgWidth = img.getWidth();
+        imgHeight = img.getHeight();
 
         Gdx.input.setCatchBackKey(true);
     }
 
     @Override
     public void render(float delta){
-        imgPosX = pos.x - iw/2;
-        imgPosY = pos.y - ih/2;
-
         //Touching
         if(Gdx.input.isTouched()){
-            pos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-            cam.unproject(pos);
+            if(Gdx.input.getX() < imgPosX + imgWidth && Gdx.input.getX() > imgPosX && Gdx.graphics.getHeight() - Gdx.input.getY() < imgPosY + imgHeight && Gdx.graphics.getHeight() - Gdx.input.getY() > imgPosY){
+                pos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+                cam.unproject(pos);
+                stillTouching = 1;
+            } else if (stillTouching == 1){
+                pos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+                cam.unproject(pos);
+            }
+        } else {
+            stillTouching = 0;
         }
 
+        imgPosX = pos.x - imgWidth /2;
+        imgPosY = pos.y - imgHeight /2;
 
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
