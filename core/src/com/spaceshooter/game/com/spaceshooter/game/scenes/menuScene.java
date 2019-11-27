@@ -8,10 +8,13 @@ import com.spaceshooter.game.FirstGdxGame;
 
 public class menuScene implements Screen {
 
-    FirstGdxGame game;
+    private FirstGdxGame game;
 
-    Texture playButton;
-    int playWidth = 0;
+    private static Texture playButton;
+    private static int playWidth = 800;
+    private static int playHeight = 500;
+    private static int playPosX = Gdx.graphics.getWidth()/2 - playWidth/2;
+    private static int playPosY = Gdx.graphics.getHeight()/2 - playHeight/2;
 
     public menuScene(FirstGdxGame game){
         this.game = game;
@@ -25,11 +28,11 @@ public class menuScene implements Screen {
 
     @Override
     public void render(float delta){
-        Gdx.gl.glClearColor(1, 0, 0, 1);
+        Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         game.batch.begin();
-        game.batch.draw(playButton,Gdx.graphics.getWidth()/2 - 400,Gdx.graphics.getHeight()/2 - 250, 800, 500);
+        game.batch.draw(playButton,playPosX, playPosY, playWidth, playHeight);
         game.batch.end();
     }
 
