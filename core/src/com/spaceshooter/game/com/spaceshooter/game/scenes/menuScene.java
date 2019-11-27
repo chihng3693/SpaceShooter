@@ -1,6 +1,7 @@
 package com.spaceshooter.game.com.spaceshooter.game.scenes;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -11,19 +12,27 @@ public class menuScene implements Screen {
     private FirstGdxGame game;
 
     private static Texture playButton;
-    private static int playWidth = 800;
-    private static int playHeight = 500;
-    private static int playPosX = Gdx.graphics.getWidth()/2 - playWidth/2;
-    private static int playPosY = Gdx.graphics.getHeight()/2 - playHeight/2;
+    private static int playWidth = 600;
+    private static int playHeight = 250;
+    private static float playPosX = Gdx.graphics.getWidth()/2 - playWidth/2;
+    private static float playPosY = Gdx.graphics.getHeight()/2 - playHeight/2;
+
+    private static Texture exitButton;
+    private static int exitWidth = 600;
+    private static int exitHeight = 250;
+    private static float exitPosX = Gdx.graphics.getWidth()/2 - exitWidth/2;
+    private static float exitPosY = playPosY - 300 - exitHeight/2;
 
     public menuScene(FirstGdxGame game){
         this.game = game;
-        playButton = new Texture("PixelArt.png");
+        playButton = new Texture("playButton.png");
+        exitButton = new Texture("exitButton.png");
     }
 
     @Override
     public void show(){
-
+        Gdx.input.setCatchBackKey(false);
+        Gdx.input.setCatchBackKey(true);
     }
 
     @Override
@@ -32,8 +41,24 @@ public class menuScene implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         game.batch.begin();
-        game.batch.draw(playButton,playPosX, playPosY, playWidth, playHeight);
+
+        //Drawing buttons and Input React
+        if(Gdx.input.getX() < playPosX + playWidth && Gdx.input.getX() > playPosX && Gdx.graphics.getHeight() - Gdx.input.getY() < playPosY + playHeight && Gdx.graphics.getHeight() - Gdx.input.getY() > playPosY){
+            if(Gdx.input.isTouched()){
+                game.setScreen(new gameScene(game));
+            }
+        }
+
+        if(Gdx.input.getX() < exitPosX + exitWidth && Gdx.input.getX() > exitPosX && Gdx.graphics.getHeight() - Gdx.input.getY() < exitPosY + exitHeight && Gdx.graphics.getHeight() - Gdx.input.getY() > exitPosY){
+            if(Gdx.input.isTouched()){
+                Gdx.app.exit();
+            }
+        }
+
+        game.batch.draw(playButton, playPosX, playPosY, playWidth, playHeight);
+        game.batch.draw(exitButton, exitPosX, exitPosY, exitWidth, exitHeight);
         game.batch.end();
+
     }
 
     @Override

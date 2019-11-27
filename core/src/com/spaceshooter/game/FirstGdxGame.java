@@ -1,6 +1,8 @@
 package com.spaceshooter.game;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.spaceshooter.game.com.spaceshooter.game.scenes.gameScene;
 import com.spaceshooter.game.com.spaceshooter.game.scenes.menuScene;
