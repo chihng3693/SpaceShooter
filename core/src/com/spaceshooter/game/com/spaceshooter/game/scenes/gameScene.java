@@ -8,6 +8,9 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector3;
 import com.spaceshooter.game.FirstGdxGame;
+import com.spaceshooter.game.com.spaceshooter.game.bullets.bullet;
+
+import java.util.ArrayList;
 
 public class gameScene implements Screen {
     private OrthographicCamera cam;
@@ -20,6 +23,8 @@ public class gameScene implements Screen {
     private float imgPosY = 0;
 
     FirstGdxGame game;
+
+    ArrayList<bullet>  bullets;
 
     private int stillTouching = 0;
 
