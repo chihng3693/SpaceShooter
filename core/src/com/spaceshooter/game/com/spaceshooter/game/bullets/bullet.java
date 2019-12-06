@@ -3,34 +3,29 @@ package com.spaceshooter.game.com.spaceshooter.game.bullets;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector;
+import com.badlogic.gdx.math.Vector2;
 
 public class bullet {
-    public static final int speed = 800;
+    public static final int speed = 500;
     private static Texture bullet;
 
-    float x, y;
+    public static Vector2 bulletLocation = new Vector2(0,0);
+    public static Vector2 bulletSpeed = new Vector2(0,0);
 
-    public boolean remove = false;
+    public static boolean remove = false;
 
-    public bullet(float x, float y){
-        this.x = x;
-        this.y = y;
-
-        if(bullet == null){
-            bullet = new Texture("bullet.png");
-
-        }
+    public bullet(Vector2 launchLocation, Vector2 launchSpeed){
+        bulletLocation = new Vector2(launchLocation.x, launchLocation.y);
+        bulletSpeed = new Vector2(launchSpeed.x, launchSpeed.y);
     }
 
-    public void update (float deltaTime){
-        y += speed * deltaTime;
-
-        if(y > Gdx.graphics.getHeight()){
-            remove = true;
-        }
+    public static void update(){
+        bulletLocation.x += bulletSpeed.x;
+        bulletLocation.y += bulletSpeed.y;
     }
 
-    public void render (SpriteBatch batch){
-        batch.draw(bullet, x, y);
+    public static void render (SpriteBatch batch){
+        batch.draw(bullet, bulletLocation.x, bulletLocation.y);
     }
 }
