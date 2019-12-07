@@ -9,18 +9,17 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.spaceshooter.game.FirstGdxGame;
+import com.spaceshooter.game.com.spaceshooter.game.bullets.asteroids;
 import com.spaceshooter.game.com.spaceshooter.game.bullets.bullet;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import javax.xml.soap.Text;
 
 public class gameScene implements Screen {
     private OrthographicCamera cam;
     private Vector3 pos;
-
-    private Texture bulletTexture;
-    private Vector2 bulletPos;
 
     private Texture img;
     private float imgWidth = 0;
@@ -30,29 +29,38 @@ public class gameScene implements Screen {
 
     FirstGdxGame game;
 
-    private float shootWait = 250;
+    private float shootWait = 500;
     private float shootTimer;
 
     ArrayList<bullet> bulletsFired;
 
     private int stillTouching = 0;
 
+    private float asteroidSpawn;
+    private float minSpawn = 0.6f;
+    private float maxSpawn = 2.0f;
+    Random random;
+    ArrayList<asteroids> asteroidsAppeared;
+
     public gameScene(FirstGdxGame game){
         this.game = game;
         bulletsFired = new ArrayList<bullet>();
+
+        random = new Random();
+        asteroidSpawn = random.nextFloat () * (maxSpawn - minSpawn) + minSpawn;
     }
 
     @Override
     public void show(){
         img = new Texture("badlogic.jpg");
-        bulletTexture = new Texture("bullet.png");
 
         cam = new OrthographicCamera();
         cam.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         pos = new Vector3(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2, 0);
 
-        bulletPos = new Vector2(pos.x,pos.y);
         bulletsFired  = new ArrayList<bullet>();
+
+        asteroidsAppeared = new ArrayList<asteroids>();
 
         imgWidth = img.getWidth();
         imgHeight = img.getHeight();
@@ -63,6 +71,23 @@ public class gameScene implements Screen {
     @Override
     public void render(float delta){
         shootTimer += 80;
+
+        //Spawn asteroids
+        asteroidSpawn -= Gdx.graphics.getDeltaTime();
+        if(asteroidSpawn <= 0){
+            asteroidSpawn = random.nextFloat () * (maxSpawn - minSpawn) + minSpawn;
+            asteroidsAppeared.add(new asteroids(random.nextInt(Gdx.graphics.getWidth())));
+        }
+
+        //Remove asteroids
+        ArrayList<asteroids> removeAsteroids = new ArrayList<asteroids>();
+        for (asteroids Asteroids : asteroidsAppeared){
+            Asteroids.update();
+            if(Asteroids.remove){
+                removeAsteroids.add(Asteroids);
+            }
+        }
+
         //Touching
         if(Gdx.input.isTouched()){
             if(Gdx.input.getX() < imgPosX + imgWidth && Gdx.input.getX() > imgPosX && Gdx.graphics.getHeight() - Gdx.input.getY() < imgPosY + imgHeight && Gdx.graphics.getHeight() - Gdx.input.getY() > imgPosY){
@@ -89,13 +114,27 @@ public class gameScene implements Screen {
         for (bullet Bullets : bulletsFired){
             Bullets.update();
             if(Bullets.remove){
-            removeBullets.add(Bullets);
+                removeBullets.add(Bullets);
             }
         }
-        bulletsFired.removeAll(removeBullets);
+
 
         imgPosX = pos.x - imgWidth /2;
         imgPosY = pos.y - imgHeight /2;
+
+        //Collision
+        for(bullet Bullets : bulletsFired){
+            for(asteroids Asteroids : asteroidsAppeared){
+                if(Bullets.getcollision().collideReact(Asteroids.getcollision())){
+                    removeBullets.add(Bullets);
+                    removeAsteroids.add(Asteroids);
+                }
+            }
+        }
+        asteroidsAppeared.removeAll(removeAsteroids);
+        bulletsFired.removeAll(removeBullets);
+
+
 
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -106,6 +145,12 @@ public class gameScene implements Screen {
         for(bullet Bullets : bulletsFired){
             Bullets.render(game.batch);
         }
+
+        //Draw asteroids
+        for(asteroids Asteroids : asteroidsAppeared){
+            Asteroids.render(game.batch);
+        }
+
 
         game.batch.end();
 
