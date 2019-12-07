@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.spaceshooter.game.FirstGdxGame;
@@ -52,12 +53,17 @@ public class gameScene implements Screen {
 
     collision playerRect;
 
+    BitmapFont scoreFont;
+
+
     public gameScene(FirstGdxGame game){
         this.game = game;
         bulletsFired = new ArrayList<bullet>();
 
         random = new Random();
         asteroidSpawn = random.nextFloat () * (maxSpawn - minSpawn) + minSpawn;
+
+        //scoreFont = new BitmapFont(Gdx.files.internal("font/score.fnt"));
     }
 
     @Override
@@ -159,6 +165,7 @@ public class gameScene implements Screen {
                     removeBullets.add(Bullets);
                     removeAsteroids.add(Asteroids);
                     explosions.add(new explosion(Asteroids.getX(), Asteroids.getY()));
+
                 }
             }
         }
