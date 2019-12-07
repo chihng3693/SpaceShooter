@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.spaceshooter.game.FirstGdxGame;
 import com.spaceshooter.game.com.spaceshooter.game.bullets.asteroids;
 import com.spaceshooter.game.com.spaceshooter.game.bullets.bullet;
+import com.spaceshooter.game.com.spaceshooter.game.collision.collision;
 import com.spaceshooter.game.com.spaceshooter.game.explosion.explosion;
 
 import java.util.ArrayList;
@@ -45,6 +46,11 @@ public class gameScene implements Screen {
 
     ArrayList<explosion> explosions;
 
+    private float health = 1;
+    Texture healthBar;
+
+    collision playerRect;
+
     public gameScene(FirstGdxGame game){
         this.game = game;
         bulletsFired = new ArrayList<bullet>();
@@ -67,8 +73,12 @@ public class gameScene implements Screen {
 
         explosions = new ArrayList<explosion>();
 
+        healthBar = new Texture("blank.png");
+
         imgWidth = img.getWidth();
         imgHeight = img.getHeight();
+
+        playerRect = new collision(0, 0, imgWidth, imgHeight);
 
         Gdx.input.setCatchBackKey(true);
     }
@@ -113,6 +123,9 @@ public class gameScene implements Screen {
             bulletsFired.add(new bullet(pos.x, pos.y));
         }
 
+        //Player movement
+        playerRect.move(imgPosX, imgPosY);
+
 
         //Remove bullet
         ArrayList<bullet> removeBullets = new ArrayList<bullet>();
@@ -147,10 +160,16 @@ public class gameScene implements Screen {
                 }
             }
         }
-        asteroidsAppeared.removeAll(removeAsteroids);
         bulletsFired.removeAll(removeBullets);
 
-
+        //Collide with player
+        for (asteroids Asteroids : asteroidsAppeared){
+            if (Asteroids.getcollision().collideReact(playerRect)) {
+                removeAsteroids.add(Asteroids);
+                health -= 0.1;
+            }
+        }
+        asteroidsAppeared.removeAll(removeAsteroids);
 
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -172,6 +191,8 @@ public class gameScene implements Screen {
             Explosions.render(game.batch);
         }
 
+        //Draw health
+        game.batch.draw(healthBar, 0, 0, Gdx.graphics.getWidth() * health, 50);
 
         game.batch.end();
 

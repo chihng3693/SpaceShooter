@@ -23,8 +23,6 @@ public class bullet {
         this.x = x;
         this.y = y;
 
-        this.rect = new collision(x, y, width, height);
-
         if(bulletTexture == null){
             bulletTexture = new Texture("bullet.png");
         }

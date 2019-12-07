@@ -2,9 +2,9 @@ package com.spaceshooter.game.com.spaceshooter.game.collision;
 
 public class collision {
     private float x, y;
-    int width, height;
+    float width, height;
 
-    public collision(float x, float y, int width, int height){
+    public collision(float x, float y, float width, float height){
         this.x = x;
         this.y = y;
         this.width = width;
