@@ -7,9 +7,12 @@ import com.spaceshooter.game.com.spaceshooter.game.collision.collision;
 
 public class asteroids {
     public static final int speed = 5;
+    public static final int bulletSpeed = 50;
     private static Texture asteroidTexture;
     public static int textureWidth = 200;
     public static int textureHeight = 300;
+
+    public int bulletTimer;
 
     collision rect;
     private int width;
@@ -21,6 +24,7 @@ public class asteroids {
     public asteroids(float x){
         this.x = x;
         this.y = Gdx.graphics.getHeight();
+        this.bulletTimer = 0;
 
         if( asteroidTexture == null){
             asteroidTexture = new Texture("bullet.png");

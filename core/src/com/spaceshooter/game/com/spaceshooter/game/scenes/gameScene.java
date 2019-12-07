@@ -8,11 +8,13 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.spaceshooter.game.FirstGdxGame;
 import com.spaceshooter.game.com.spaceshooter.game.bullets.asteroids;
 import com.spaceshooter.game.com.spaceshooter.game.bullets.bullet;
+import com.spaceshooter.game.com.spaceshooter.game.bullets.enemyBullet;
 import com.spaceshooter.game.com.spaceshooter.game.collision.collision;
 import com.spaceshooter.game.com.spaceshooter.game.explosion.explosion;
 
@@ -35,14 +37,17 @@ public class gameScene implements Screen {
 
     private float shootWait = 500;
     private float shootTimer;
+    private float enemyTimer;
 
     ArrayList<bullet> bulletsFired;
+    ArrayList<enemyBullet> enemyFired;
 
     private int stillTouching = 0;
 
+    //Spawing asteroids
     private float asteroidSpawn;
     private float minSpawn = 0.6f;
-    private float maxSpawn = 2.0f;
+    private float maxSpawn = 5.0f;
     Random random;
     ArrayList<asteroids> asteroidsAppeared;
 
@@ -54,6 +59,7 @@ public class gameScene implements Screen {
     collision playerRect;
 
     BitmapFont scoreFont;
+    int score;
 
 
     public gameScene(FirstGdxGame game){
@@ -63,7 +69,8 @@ public class gameScene implements Screen {
         random = new Random();
         asteroidSpawn = random.nextFloat () * (maxSpawn - minSpawn) + minSpawn;
 
-        //scoreFont = new BitmapFont(Gdx.files.internal("font/score.fnt"));
+        scoreFont = new BitmapFont(Gdx.files.internal("font.fnt"));
+        score = 0;
     }
 
     @Override
@@ -74,7 +81,8 @@ public class gameScene implements Screen {
         cam.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         pos = new Vector3(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2, 0);
 
-        bulletsFired  = new ArrayList<bullet>();
+        bulletsFired = new ArrayList<bullet>();
+        enemyFired = new ArrayList<enemyBullet>();
 
         asteroidsAppeared = new ArrayList<asteroids>();
 
@@ -108,9 +116,9 @@ public class gameScene implements Screen {
             stillTouching = 0;
         }
 
+        //Determine spaceship's position
         imgPosX = pos.x - imgWidth /2;
         imgPosY = pos.y - imgHeight /2;
-
 
         //Spawn asteroids
         asteroidSpawn -= Gdx.graphics.getDeltaTime();
@@ -128,16 +136,23 @@ public class gameScene implements Screen {
             }
         }
 
-
         //Add bullet
         if(shootTimer >= shootWait) {
             shootTimer = 0;
             bulletsFired.add(new bullet(pos.x, pos.y));
         }
 
+        //Add enemy bullet
+        for(asteroids Asteroids : asteroidsAppeared){
+            Asteroids.bulletTimer += 10;
+            if(Asteroids.bulletTimer >= shootWait) {
+                Asteroids.bulletTimer = 0;
+                enemyFired.add(new enemyBullet(Asteroids.getX() + 25, Asteroids.getY()));
+            }
+        }
+
         //Player movement
         playerRect.move(imgPosX, imgPosY);
-
 
         //Remove bullet
         ArrayList<bullet> removeBullets = new ArrayList<bullet>();
@@ -145,6 +160,15 @@ public class gameScene implements Screen {
             Bullets.update();
             if(Bullets.remove){
                 removeBullets.add(Bullets);
+            }
+        }
+
+        //Remove enemy bullet
+        ArrayList<enemyBullet> removeEnemyBullets = new ArrayList<enemyBullet>();
+        for (enemyBullet EnemyBullets : enemyFired){
+            EnemyBullets.update();
+            if(EnemyBullets.remove){
+                removeEnemyBullets.add(EnemyBullets);
             }
         }
 
@@ -165,11 +189,12 @@ public class gameScene implements Screen {
                     removeBullets.add(Bullets);
                     removeAsteroids.add(Asteroids);
                     explosions.add(new explosion(Asteroids.getX(), Asteroids.getY()));
-
+                    score += 100;
                 }
             }
         }
         bulletsFired.removeAll(removeBullets);
+
 
         //Collide with player
         for (asteroids Asteroids : asteroidsAppeared){
@@ -180,14 +205,33 @@ public class gameScene implements Screen {
         }
         asteroidsAppeared.removeAll(removeAsteroids);
 
+        //Bullet hits player
+        for (enemyBullet Enemies : enemyFired){
+            if(Enemies.getcollision().collideReact(playerRect)){
+                removeEnemyBullets.add(Enemies);
+                health -= 0.1;
+            }
+        }
+        enemyFired.removeAll(removeEnemyBullets);
+
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         game.batch.begin();
+
+        //Draw score
+        GlyphLayout scoreLayout = new GlyphLayout(scoreFont, "" + score);
+        scoreFont.draw(game.batch, scoreLayout, Gdx.graphics.getWidth()/2 - scoreLayout.width/2, Gdx.graphics.getHeight() - scoreLayout.height - 10);
+
         game.batch.draw(img, imgPosX, imgPosY);
 
         //Draw bullet
         for(bullet Bullets : bulletsFired){
             Bullets.render(game.batch);
+        }
+
+        //Draw enemy bullet
+        for(enemyBullet Enemies : enemyFired){
+            Enemies.render(game.batch);
         }
 
         //Draw asteroids
