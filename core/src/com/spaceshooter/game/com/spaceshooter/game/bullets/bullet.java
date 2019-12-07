@@ -7,20 +7,29 @@ import com.badlogic.gdx.math.Vector;
 import com.badlogic.gdx.math.Vector2;
 
 public class bullet {
-    public static Vector2 bulletLocation = new Vector2(0,0);
-    public static Vector2 bulletSpeed = new Vector2(0,0);
+    public static final int speed = 20;
+    private static Texture bulletTexture;
 
-    public static boolean remove = false;
+    float x,y;
+    public boolean remove = false;
 
-    public bullet(Vector2 launchLocation, Vector2 launchSpeed){
-        bulletLocation = new Vector2(launchLocation.x, launchLocation.y);
-        bulletSpeed = new Vector2(launchSpeed.x, launchSpeed.y);
+    public bullet(float x, float y){
+        this.x = x;
+        this.y = y;
+
+        if(bulletTexture == null){
+            bulletTexture = new Texture("bullet.png");
+        }
     }
 
-    public static void update(){
-        bulletLocation.y += bulletSpeed.y;
+    public void update(){
+        y += speed;
+        if(y > Gdx.graphics.getHeight()){
+            remove = true;
+        }
     }
 
-    public static void render (SpriteBatch batch){
+    public void render(SpriteBatch batch){
+        batch.draw(bulletTexture, x, y);
     }
 }

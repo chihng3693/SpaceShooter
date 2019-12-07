@@ -33,15 +33,13 @@ public class gameScene implements Screen {
     private float shootWait = 250;
     private float shootTimer;
 
-    private boolean bulletTrigger = false;
-
-    ArrayList<bullet> bulletFired = new ArrayList<bullet>();
+    ArrayList<bullet> bulletsFired;
 
     private int stillTouching = 0;
 
     public gameScene(FirstGdxGame game){
         this.game = game;
-
+        bulletsFired = new ArrayList<bullet>();
     }
 
     @Override
@@ -54,7 +52,7 @@ public class gameScene implements Screen {
         pos = new Vector3(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2, 0);
 
         bulletPos = new Vector2(pos.x,pos.y);
-        bulletFired  = new ArrayList<bullet>();
+        bulletsFired  = new ArrayList<bullet>();
 
         imgWidth = img.getWidth();
         imgHeight = img.getHeight();
@@ -64,6 +62,7 @@ public class gameScene implements Screen {
 
     @Override
     public void render(float delta){
+        shootTimer += 50;
         //Touching
         if(Gdx.input.isTouched()){
             if(Gdx.input.getX() < imgPosX + imgWidth && Gdx.input.getX() > imgPosX && Gdx.graphics.getHeight() - Gdx.input.getY() < imgPosY + imgHeight && Gdx.graphics.getHeight() - Gdx.input.getY() > imgPosY){
@@ -76,14 +75,24 @@ public class gameScene implements Screen {
             }
         } else {
             stillTouching = 0;
-            bulletTrigger = false;
         }
 
         //Add bullet
-        if(Gdx.input.isKeyPressed(Input.Keys.SPACE)){
-            bullet bulletShot = new bullet(bulletPos,new Vector2(0,30));
-            bulletFired.add(bulletShot);
+        if(shootTimer >= shootWait) {
+            shootTimer = 0;
+            bulletsFired.add(new bullet(pos.x, pos.y));
         }
+
+
+        //Remove bullet
+        ArrayList<bullet> removeBullets = new ArrayList<bullet>();
+        for (bullet Bullets : bulletsFired){
+            Bullets.update();
+            if(Bullets.remove){
+            removeBullets.add(Bullets);
+            }
+        }
+        bulletsFired.removeAll(removeBullets);
 
         imgPosX = pos.x - imgWidth /2;
         imgPosY = pos.y - imgHeight /2;
@@ -94,13 +103,8 @@ public class gameScene implements Screen {
         game.batch.draw(img, imgPosX, imgPosY);
 
         //Draw bullet
-        int bulletCount = 0;
-        while (bulletCount < bulletFired.size()){
-            bullet currentBullet = bulletFired.get(bulletCount);
-            currentBullet.update();
-            game.batch.draw(bulletTexture, currentBullet.bulletLocation.x, currentBullet.bulletLocation.y);
-
-            bulletCount++;
+        for(bullet Bullets : bulletsFired){
+            Bullets.render(game.batch);
         }
 
         game.batch.end();
