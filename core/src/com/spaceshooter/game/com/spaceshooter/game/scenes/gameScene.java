@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.spaceshooter.game.FirstGdxGame;
 import com.spaceshooter.game.com.spaceshooter.game.bullets.asteroids;
 import com.spaceshooter.game.com.spaceshooter.game.bullets.bullet;
+import com.spaceshooter.game.com.spaceshooter.game.explosion.explosion;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -42,6 +43,8 @@ public class gameScene implements Screen {
     Random random;
     ArrayList<asteroids> asteroidsAppeared;
 
+    ArrayList<explosion> explosions;
+
     public gameScene(FirstGdxGame game){
         this.game = game;
         bulletsFired = new ArrayList<bullet>();
@@ -62,6 +65,8 @@ public class gameScene implements Screen {
 
         asteroidsAppeared = new ArrayList<asteroids>();
 
+        explosions = new ArrayList<explosion>();
+
         imgWidth = img.getWidth();
         imgHeight = img.getHeight();
 
@@ -76,7 +81,7 @@ public class gameScene implements Screen {
         asteroidSpawn -= Gdx.graphics.getDeltaTime();
         if(asteroidSpawn <= 0){
             asteroidSpawn = random.nextFloat () * (maxSpawn - minSpawn) + minSpawn;
-            asteroidsAppeared.add(new asteroids(random.nextInt(Gdx.graphics.getWidth())));
+            asteroidsAppeared.add(new asteroids(random.nextInt(Gdx.graphics.getWidth() - asteroids.textureWidth)));
         }
 
         //Remove asteroids
@@ -122,12 +127,23 @@ public class gameScene implements Screen {
         imgPosX = pos.x - imgWidth /2;
         imgPosY = pos.y - imgHeight /2;
 
+        //Refresh explosion
+        ArrayList<explosion> removeExplosion = new ArrayList<explosion>();
+        for (explosion Explosions : explosions){
+            Explosions.update();
+            if(Explosions.remove){
+                removeExplosion.add(Explosions);
+            }
+        }
+        explosions.removeAll(removeExplosion);
+
         //Collision
         for(bullet Bullets : bulletsFired){
             for(asteroids Asteroids : asteroidsAppeared){
                 if(Bullets.getcollision().collideReact(Asteroids.getcollision())){
                     removeBullets.add(Bullets);
                     removeAsteroids.add(Asteroids);
+                    explosions.add(new explosion(Asteroids.getX(), Asteroids.getY()));
                 }
             }
         }
@@ -149,6 +165,11 @@ public class gameScene implements Screen {
         //Draw asteroids
         for(asteroids Asteroids : asteroidsAppeared){
             Asteroids.render(game.batch);
+        }
+
+        //Draw explosion
+        for(explosion Explosions : explosions){
+            Explosions.render(game.batch);
         }
 
 

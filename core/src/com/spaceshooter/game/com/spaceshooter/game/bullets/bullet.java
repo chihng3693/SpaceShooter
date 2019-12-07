@@ -43,6 +43,14 @@ public class bullet {
         rect.move(x, y);
     }
 
+    public float getX(){
+        return x;
+    }
+
+    public float getY(){
+        return y;
+    }
+
     public collision getcollision(){
         return rect;
     }

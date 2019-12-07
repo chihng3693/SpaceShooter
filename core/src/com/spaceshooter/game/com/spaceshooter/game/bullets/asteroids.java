@@ -15,7 +15,7 @@ public class asteroids {
     private int width;
     private int height;
 
-    float x,y;
+    private float x,y;
     public boolean remove = false;
 
     public asteroids(float x){
@@ -42,6 +42,14 @@ public class asteroids {
 
     public collision getcollision(){
         return rect;
+    }
+
+    public float getX(){
+        return x;
+    }
+
+    public float getY(){
+        return y;
     }
 
     public void render(SpriteBatch batch){
