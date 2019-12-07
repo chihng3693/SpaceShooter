@@ -30,7 +30,12 @@ public class gameScene implements Screen {
 
     FirstGdxGame game;
 
-    bullet bulletsFired;
+    private float shootWait = 250;
+    private float shootTimer;
+
+    private boolean bulletTrigger = false;
+
+    ArrayList<bullet> bulletFired;
 
     private int stillTouching = 0;
 
@@ -48,9 +53,8 @@ public class gameScene implements Screen {
         cam.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         pos = new Vector3(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2, 0);
 
-
         bulletPos = new Vector2(pos.x,pos.y);
-        bulletsFired = new bullet(bulletPos, new Vector2(0,100));
+        bulletFired  = new ArrayList<bullet>();
 
         imgWidth = img.getWidth();
         imgHeight = img.getHeight();
@@ -58,13 +62,9 @@ public class gameScene implements Screen {
         Gdx.input.setCatchBackKey(true);
     }
 
-    public void update(){
-
-    }
-
     @Override
     public void render(float delta){
-        bulletsFired.update();
+        shootTimer += 10;
 
         //Touching
         if(Gdx.input.isTouched()){
@@ -72,20 +72,24 @@ public class gameScene implements Screen {
                 pos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
                 cam.unproject(pos);
                 stillTouching = 1;
-
             } else if (stillTouching == 1){
                 pos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
                 cam.unproject(pos);
+
             }
-        } else {
+        } else if (!Gdx.input.isTouched()){
             stillTouching = 0;
+            bulletTrigger = false;
         }
 
         //Add bullet
-        if(stillTouching == 1){
-           // bulletsFired.add(new bullet(pos.x, pos.y));
+        if(shootTimer >= shootWait){
+            shootTimer = 0;
+            bulletPos.x = pos.x;
+            bulletPos.y = pos.y;
+            bullet bulletShot = new bullet(bulletPos, new Vector2(0,30));
+            bulletFired.add(bulletShot);
         }
-
 
         imgPosX = pos.x - imgWidth /2;
         imgPosY = pos.y - imgHeight /2;
@@ -96,7 +100,22 @@ public class gameScene implements Screen {
         game.batch.draw(img, imgPosX, imgPosY);
 
         //Draw bullet
-        game.batch.draw(bullet,bulletsFired.bulletLocation.x,bulletsFired.bulletLocation.y);
+        int bulletCount = 0;
+        while (bulletCount < bulletFired.size()){
+            bullet currentBullet = bulletFired.get(bulletCount);
+            currentBullet.update();
+
+            //Remove bullet
+            if(currentBullet.bulletLocation.x > 0 && currentBullet.bulletLocation.x < Gdx.graphics.getWidth() && currentBullet.bulletLocation.y > 0 && currentBullet.bulletLocation.y < Gdx.graphics.getHeight()){
+                game.batch.draw(bullet, currentBullet.bulletLocation.x, currentBullet.bulletLocation.y);
+            } else {
+                bulletFired.remove(bulletCount);
+                /*if(bulletFired.size() > 0){
+                    bulletCount--;
+                }*/
+            }
+            bulletCount++;
+        }
 
         game.batch.end();
 
