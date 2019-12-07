@@ -19,7 +19,7 @@ public class gameScene implements Screen {
     private OrthographicCamera cam;
     private Vector3 pos;
 
-    private Texture bullet;
+    private Texture bulletTexture;
     private Vector2 bulletPos;
 
     private Texture img;
@@ -35,7 +35,7 @@ public class gameScene implements Screen {
 
     private boolean bulletTrigger = false;
 
-    ArrayList<bullet> bulletFired;
+    ArrayList<bullet> bulletFired = new ArrayList<bullet>();
 
     private int stillTouching = 0;
 
@@ -47,7 +47,7 @@ public class gameScene implements Screen {
     @Override
     public void show(){
         img = new Texture("badlogic.jpg");
-        bullet = new Texture("bullet.png");
+        bulletTexture = new Texture("bullet.png");
 
         cam = new OrthographicCamera();
         cam.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -64,8 +64,6 @@ public class gameScene implements Screen {
 
     @Override
     public void render(float delta){
-        shootTimer += 10;
-
         //Touching
         if(Gdx.input.isTouched()){
             if(Gdx.input.getX() < imgPosX + imgWidth && Gdx.input.getX() > imgPosX && Gdx.graphics.getHeight() - Gdx.input.getY() < imgPosY + imgHeight && Gdx.graphics.getHeight() - Gdx.input.getY() > imgPosY){
@@ -75,19 +73,15 @@ public class gameScene implements Screen {
             } else if (stillTouching == 1){
                 pos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
                 cam.unproject(pos);
-
             }
-        } else if (!Gdx.input.isTouched()){
+        } else {
             stillTouching = 0;
             bulletTrigger = false;
         }
 
         //Add bullet
-        if(shootTimer >= shootWait){
-            shootTimer = 0;
-            bulletPos.x = pos.x;
-            bulletPos.y = pos.y;
-            bullet bulletShot = new bullet(bulletPos, new Vector2(0,30));
+        if(Gdx.input.isKeyPressed(Input.Keys.SPACE)){
+            bullet bulletShot = new bullet(bulletPos,new Vector2(0,30));
             bulletFired.add(bulletShot);
         }
 
@@ -104,16 +98,8 @@ public class gameScene implements Screen {
         while (bulletCount < bulletFired.size()){
             bullet currentBullet = bulletFired.get(bulletCount);
             currentBullet.update();
+            game.batch.draw(bulletTexture, currentBullet.bulletLocation.x, currentBullet.bulletLocation.y);
 
-            //Remove bullet
-            if(currentBullet.bulletLocation.x > 0 && currentBullet.bulletLocation.x < Gdx.graphics.getWidth() && currentBullet.bulletLocation.y > 0 && currentBullet.bulletLocation.y < Gdx.graphics.getHeight()){
-                game.batch.draw(bullet, currentBullet.bulletLocation.x, currentBullet.bulletLocation.y);
-            } else {
-                bulletFired.remove(bulletCount);
-                /*if(bulletFired.size() > 0){
-                    bulletCount--;
-                }*/
-            }
             bulletCount++;
         }
 
