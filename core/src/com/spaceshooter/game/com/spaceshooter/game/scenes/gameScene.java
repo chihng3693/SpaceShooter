@@ -3,6 +3,7 @@ package com.spaceshooter.game.com.spaceshooter.game.scenes;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -87,6 +88,24 @@ public class gameScene implements Screen {
     public void render(float delta){
         shootTimer += 80;
 
+        //Touching
+        if(Gdx.input.isTouched()){
+            if(Gdx.input.getX() < imgPosX + imgWidth && Gdx.input.getX() > imgPosX && Gdx.graphics.getHeight() - Gdx.input.getY() < imgPosY + imgHeight && Gdx.graphics.getHeight() - Gdx.input.getY() > imgPosY){
+                pos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+                cam.unproject(pos);
+                stillTouching = 1;
+            } else if (stillTouching == 1){
+                pos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+                cam.unproject(pos);
+            }
+        } else {
+            stillTouching = 0;
+        }
+
+        imgPosX = pos.x - imgWidth /2;
+        imgPosY = pos.y - imgHeight /2;
+
+
         //Spawn asteroids
         asteroidSpawn -= Gdx.graphics.getDeltaTime();
         if(asteroidSpawn <= 0){
@@ -103,19 +122,6 @@ public class gameScene implements Screen {
             }
         }
 
-        //Touching
-        if(Gdx.input.isTouched()){
-            if(Gdx.input.getX() < imgPosX + imgWidth && Gdx.input.getX() > imgPosX && Gdx.graphics.getHeight() - Gdx.input.getY() < imgPosY + imgHeight && Gdx.graphics.getHeight() - Gdx.input.getY() > imgPosY){
-                pos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-                cam.unproject(pos);
-                stillTouching = 1;
-            } else if (stillTouching == 1){
-                pos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-                cam.unproject(pos);
-            }
-        } else {
-            stillTouching = 0;
-        }
 
         //Add bullet
         if(shootTimer >= shootWait) {
@@ -135,10 +141,6 @@ public class gameScene implements Screen {
                 removeBullets.add(Bullets);
             }
         }
-
-
-        imgPosX = pos.x - imgWidth /2;
-        imgPosY = pos.y - imgHeight /2;
 
         //Refresh explosion
         ArrayList<explosion> removeExplosion = new ArrayList<explosion>();
@@ -192,7 +194,15 @@ public class gameScene implements Screen {
         }
 
         //Draw health
+        if(health > 0.6f){
+            game.batch.setColor(Color.GREEN);
+        } else if (health > 0.2f){
+            game.batch.setColor(Color.ORANGE);
+        } else {
+            game.batch.setColor(Color.RED);
+        }
         game.batch.draw(healthBar, 0, 0, Gdx.graphics.getWidth() * health, 50);
+        game.batch.setColor((Color.WHITE));
 
         game.batch.end();
 
