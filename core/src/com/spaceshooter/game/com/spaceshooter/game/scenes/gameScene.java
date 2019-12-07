@@ -46,8 +46,8 @@ public class gameScene implements Screen {
 
     //Spawing asteroids
     private float asteroidSpawn;
-    private float minSpawn = 0.6f;
-    private float maxSpawn = 5.0f;
+    private float minSpawn = 1.0f;
+    private float maxSpawn = 4.0f;
     Random random;
     ArrayList<asteroids> asteroidsAppeared;
 
