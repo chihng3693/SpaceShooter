@@ -62,7 +62,7 @@ public class gameScene implements Screen {
 
     @Override
     public void render(float delta){
-        shootTimer += 50;
+        shootTimer += 80;
         //Touching
         if(Gdx.input.isTouched()){
             if(Gdx.input.getX() < imgPosX + imgWidth && Gdx.input.getX() > imgPosX && Gdx.graphics.getHeight() - Gdx.input.getY() < imgPosY + imgHeight && Gdx.graphics.getHeight() - Gdx.input.getY() > imgPosY){
