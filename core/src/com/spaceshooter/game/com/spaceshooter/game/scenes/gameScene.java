@@ -214,6 +214,13 @@ public class gameScene implements Screen {
         }
         enemyFired.removeAll(removeEnemyBullets);
 
+        //When player died
+        if(health <= 0){
+            this.dispose();
+            game.setScreen(new gameOverScene(game, score));
+            return;
+        }
+
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         game.batch.begin();
@@ -261,9 +268,6 @@ public class gameScene implements Screen {
             // change screen to MainMenu
             game.setScreen(new menuScene(game));
         }
-
-
-
     }
 
     @Override
