@@ -3,9 +3,15 @@ package com.spaceshooter.game.com.spaceshooter.game.scenes;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.spaceshooter.game.FirstGdxGame;
+import com.spaceshooter.game.com.spaceshooter.game.background.background;
+import com.spaceshooter.game.com.spaceshooter.game.bullets.asteroids;
+import com.spaceshooter.game.com.spaceshooter.game.bullets.bullet;
+import com.spaceshooter.game.com.spaceshooter.game.bullets.enemyBullet;
+import com.spaceshooter.game.com.spaceshooter.game.explosion.explosion;
 
 public class menuScene implements Screen {
 
@@ -23,6 +29,8 @@ public class menuScene implements Screen {
     private static float exitPosX = Gdx.graphics.getWidth()/2 - exitWidth/2;
     private static float exitPosY = playPosY - 300 - exitHeight/2;
 
+    private Sound pressbutton;
+
     public menuScene(FirstGdxGame game){
         this.game = game;
         playButton = new Texture("playButton.png");
@@ -31,6 +39,8 @@ public class menuScene implements Screen {
 
     @Override
     public void show(){
+        pressbutton = Gdx.audio.newSound(Gdx.files.internal("phaseJump3.mp3"));
+
         Gdx.input.setCatchBackKey(false);
         Gdx.input.setCatchBackKey(true);
     }
@@ -45,12 +55,15 @@ public class menuScene implements Screen {
         //Drawing buttons and Input React
         if(Gdx.input.getX() < playPosX + playWidth && Gdx.input.getX() > playPosX && Gdx.graphics.getHeight() - Gdx.input.getY() < playPosY + playHeight && Gdx.graphics.getHeight() - Gdx.input.getY() > playPosY){
             if(Gdx.input.isTouched()){
+                pressbutton.play();
                 game.setScreen(new gameScene(game));
             }
         }
 
         if(Gdx.input.getX() < exitPosX + exitWidth && Gdx.input.getX() > exitPosX && Gdx.graphics.getHeight() - Gdx.input.getY() < exitPosY + exitHeight && Gdx.graphics.getHeight() - Gdx.input.getY() > exitPosY){
             if(Gdx.input.isTouched()){
+                pressbutton.play();
+                this.dispose();
                 Gdx.app.exit();
             }
         }
