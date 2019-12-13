@@ -6,8 +6,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.spaceshooter.game.com.spaceshooter.game.collision.collision;
 
 public class enemyBullet {
-    public static final int speed = 10;
-    private static Texture bulletTexture;
+    public static final int speed = 20;
+    public static Texture bulletTexture;
     public int enemyTimer;
 
 

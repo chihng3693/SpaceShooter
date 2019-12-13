@@ -3,6 +3,8 @@ package com.spaceshooter.game.com.spaceshooter.game.scenes;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -13,13 +15,16 @@ import com.spaceshooter.game.FirstGdxGame;
 
 public class gameOverScene implements Screen{
     FirstGdxGame game;
-    int score, highScore;
+    int score, highScore, musicflag=0;
 
     private static int bannerWidth = 800;
     private static int bannerHeight = 150;
+    private boolean flag=false;
 
     Texture gameOverBanner;
     BitmapFont scoreFont;
+    private Music gameover;
+    private Sound pressbutton;
 
     public gameOverScene (FirstGdxGame game, int score){
         this.game = game;
@@ -38,19 +43,27 @@ public class gameOverScene implements Screen{
         //Load texture
         gameOverBanner = new Texture("gameOver.png");
         scoreFont = new BitmapFont(Gdx.files.internal("font.fnt"));
+
     }
 
     @Override
     public void show(){
-
+        gameover = Gdx.audio.newMusic(Gdx.files.internal("gameOver.mp3"));
+        pressbutton = Gdx.audio.newSound(Gdx.files.internal("phaseJump3.mp3"));
     }
 
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        game.batch.begin();
 
+        if (!gameover.isPlaying() && musicflag == 0) {
+            gameover.setVolume(0.8f);
+            gameover.play();
+            musicflag = 1;
+        }
+
+        game.batch.begin();
         //Draw game over
         game.batch.draw(gameOverBanner, Gdx.graphics.getWidth() / 2 - bannerWidth / 2, Gdx.graphics.getHeight() - bannerHeight - 300, bannerWidth, bannerHeight);
 
@@ -72,6 +85,7 @@ public class gameOverScene implements Screen{
         float touchY = Gdx.graphics.getHeight() - Gdx.input.getY();
 
         if (Gdx.input.isTouched()) {
+            pressbutton.play();
             //Press Try Again
             if (touchX < tryX + tryAgainLayout.width && touchX > tryX && touchY < tryY && touchY > tryY - tryAgainLayout.height) {
                 this.dispose();

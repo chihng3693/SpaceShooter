@@ -8,8 +8,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.spaceshooter.game.com.spaceshooter.game.collision.collision;
 
 public class bullet {
-    public static final int speed = 80;
-    private static Texture bulletTexture;
+    public static final int speed = 30;
+    public static Texture bulletTexture;
 
 
     private float x,y;

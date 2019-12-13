@@ -6,11 +6,11 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.spaceshooter.game.com.spaceshooter.game.collision.collision;
 
 public class asteroids {
-    public static final int speed = 5;
+    public static final int speed = 10;
     public static final int bulletSpeed = 50;
-    private static Texture asteroidTexture;
+    public static Texture asteroidTexture;
     public static int textureWidth = 200;
-    public static int textureHeight = 300;
+    public static int textureHeight = 200;
 
     public int bulletTimer;
 
@@ -27,13 +27,13 @@ public class asteroids {
         this.bulletTimer = 0;
 
         if( asteroidTexture == null){
-            asteroidTexture = new Texture("bullet.png");
+            asteroidTexture = new Texture("spaceship.png");
         }
 
         this.width = asteroidTexture.getWidth();
         this.height = asteroidTexture.getHeight();
 
-        this.rect = new collision(x, y, 50, 100);
+        this.rect = new collision(x, y, 200, 200);
     }
 
     public void update(){
@@ -57,7 +57,7 @@ public class asteroids {
     }
 
     public void render(SpriteBatch batch){
-        batch.draw(asteroidTexture, x, y, 50, 100);
+        batch.draw(asteroidTexture, x, y, 200, 200);
     }
 
 }

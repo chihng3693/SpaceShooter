@@ -12,7 +12,7 @@ public class explosion {
     public static int offset = 8;
     public static int size = 400;
 
-    private static Animation animate = null;
+    public static Animation animate = null;
     private float x, y;
     float stateTime;
 
@@ -39,8 +39,6 @@ public class explosion {
     public void render (SpriteBatch batch){
         batch.draw((TextureRegion) animate.getKeyFrame(stateTime), x, y);
     }
-
-
 
 
 }

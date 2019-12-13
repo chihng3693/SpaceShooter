@@ -3,6 +3,9 @@ package com.spaceshooter.game.com.spaceshooter.game.scenes;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.assets.loaders.SoundLoader;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -12,6 +15,7 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.spaceshooter.game.FirstGdxGame;
+import com.spaceshooter.game.com.spaceshooter.game.background.background;
 import com.spaceshooter.game.com.spaceshooter.game.bullets.asteroids;
 import com.spaceshooter.game.com.spaceshooter.game.bullets.bullet;
 import com.spaceshooter.game.com.spaceshooter.game.bullets.enemyBullet;
@@ -27,7 +31,7 @@ public class gameScene implements Screen {
     private OrthographicCamera cam;
     private Vector3 pos;
 
-    private Texture img;
+    public Texture img;
     private float imgWidth = 0;
     private float imgHeight = 0;
     private float imgPosX = 0;
@@ -35,7 +39,7 @@ public class gameScene implements Screen {
 
     FirstGdxGame game;
 
-    private float shootWait = 500;
+    private float shootWait = 800;
     private float shootTimer;
     private float enemyTimer;
 
@@ -61,6 +65,14 @@ public class gameScene implements Screen {
     BitmapFont scoreFont;
     int score;
 
+    background bg;
+
+    public Sound playershoot;
+    public Sound enemyshoot;
+    public Sound minuslife;
+    public Sound addscore;
+    public Sound explode;
+    public Music bgmusic;
 
     public gameScene(FirstGdxGame game){
         this.game = game;
@@ -75,11 +87,11 @@ public class gameScene implements Screen {
 
     @Override
     public void show(){
-        img = new Texture("badlogic.jpg");
+        img = new Texture("shooter.png");
 
         cam = new OrthographicCamera();
         cam.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        pos = new Vector3(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2, 0);
+        pos = new Vector3(Gdx.graphics.getWidth()/2, img.getHeight(), 0);
 
         bulletsFired = new ArrayList<bullet>();
         enemyFired = new ArrayList<enemyBullet>();
@@ -95,12 +107,26 @@ public class gameScene implements Screen {
 
         playerRect = new collision(0, 0, imgWidth, imgHeight);
 
+        bg = new background();
+
+        playershoot = Gdx.audio.newSound(Gdx.files.internal("laser5.mp3"));
+        enemyshoot = Gdx.audio.newSound(Gdx.files.internal("highDown.mp3"));
+        minuslife = Gdx.audio.newSound(Gdx.files.internal("phaserDown1.mp3"));
+        addscore = Gdx.audio.newSound(Gdx.files.internal("powerUp7.mp3"));
+        explode = Gdx.audio.newSound(Gdx.files.internal("boom.mp3"));
+        bgmusic = Gdx.audio.newMusic(Gdx.files.internal("bgm1.mp3"));
+
         Gdx.input.setCatchBackKey(true);
     }
 
     @Override
     public void render(float delta){
-        shootTimer += 80;
+        //play background music
+        bgmusic.setVolume(0.5f);
+        bgmusic.play();
+        bgmusic.setLooping(true);
+
+        shootTimer += 60;
 
         //Touching
         if(Gdx.input.isTouched()){
@@ -140,14 +166,16 @@ public class gameScene implements Screen {
         if(shootTimer >= shootWait) {
             shootTimer = 0;
             bulletsFired.add(new bullet(pos.x, pos.y));
+            playershoot.play(0.8f);
         }
 
         //Add enemy bullet
         for(asteroids Asteroids : asteroidsAppeared){
-            Asteroids.bulletTimer += 10;
+            Asteroids.bulletTimer += 25;
             if(Asteroids.bulletTimer >= shootWait) {
                 Asteroids.bulletTimer = 0;
-                enemyFired.add(new enemyBullet(Asteroids.getX() + 25, Asteroids.getY()));
+                enemyFired.add(new enemyBullet(Asteroids.getX()+Asteroids.textureWidth/2, Asteroids.getY()));
+                enemyshoot.play();
             }
         }
 
@@ -189,6 +217,7 @@ public class gameScene implements Screen {
                     removeBullets.add(Bullets);
                     removeAsteroids.add(Asteroids);
                     explosions.add(new explosion(Asteroids.getX(), Asteroids.getY()));
+                    explode.play(0.3f);
                     score += 100;
                 }
             }
@@ -201,6 +230,7 @@ public class gameScene implements Screen {
             if (Asteroids.getcollision().collideReact(playerRect)) {
                 removeAsteroids.add(Asteroids);
                 health -= 0.1;
+                minuslife.play();
             }
         }
         asteroidsAppeared.removeAll(removeAsteroids);
@@ -210,12 +240,14 @@ public class gameScene implements Screen {
             if(Enemies.getcollision().collideReact(playerRect)){
                 removeEnemyBullets.add(Enemies);
                 health -= 0.1;
+                minuslife.play();
             }
         }
         enemyFired.removeAll(removeEnemyBullets);
 
         //When player died
         if(health <= 0){
+            bgmusic.stop();
             this.dispose();
             game.setScreen(new gameOverScene(game, score));
             return;
@@ -225,16 +257,19 @@ public class gameScene implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         game.batch.begin();
 
+        //Draw stars
+        bg.render(game.batch);
+
         //Draw score
         GlyphLayout scoreLayout = new GlyphLayout(scoreFont, "" + score);
         scoreFont.draw(game.batch, scoreLayout, Gdx.graphics.getWidth()/2 - scoreLayout.width/2, Gdx.graphics.getHeight() - scoreLayout.height - 10);
-
-        game.batch.draw(img, imgPosX, imgPosY);
 
         //Draw bullet
         for(bullet Bullets : bulletsFired){
             Bullets.render(game.batch);
         }
+
+        game.batch.draw(img, imgPosX, imgPosY, 270, 210);
 
         //Draw enemy bullet
         for(enemyBullet Enemies : enemyFired){
@@ -277,21 +312,21 @@ public class gameScene implements Screen {
 
     @Override
     public void pause(){
-
+        bgmusic.stop();
     }
 
     @Override
     public void resume(){
-
+        bgmusic.play();
     }
 
     @Override
     public void hide(){
-
+        bgmusic.stop();
     }
 
     @Override
     public void dispose(){
-
+        bgmusic.dispose();
     }
 }
