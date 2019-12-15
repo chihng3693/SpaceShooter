@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.spaceshooter.game.com.spaceshooter.game.collision.collision;
 
 public class bullet {
-    public static final int speed = 80;
+    public static final int speed = 20;
     private static Texture bulletTexture;
 
 
@@ -17,6 +17,7 @@ public class bullet {
     private int height = 300;
     public boolean remove = false;
 
+
     collision rect;
 
     public bullet(float x, float y){
@@ -24,7 +25,7 @@ public class bullet {
         this.y = y;
 
         if(bulletTexture == null){
-            bulletTexture = new Texture("bullet.png");
+            bulletTexture = new Texture("dot3.png");
         }
 
         this.width = bulletTexture.getWidth();
@@ -33,12 +34,24 @@ public class bullet {
         this.rect = new collision(x, y, width, height);
     }
 
+
     public void update(){
         y += speed;
+
+
         if(y > Gdx.graphics.getHeight()){
             remove = true;
         }
         rect.move(x, y);
+    }
+
+    public void update1(){
+        y +=speed;
+
+        if (y> Gdx.graphics.getHeight() || x > Gdx.graphics.getWidth()){
+            remove = true;
+        }
+        rect.move(x,y);
     }
 
     public float getX(){
