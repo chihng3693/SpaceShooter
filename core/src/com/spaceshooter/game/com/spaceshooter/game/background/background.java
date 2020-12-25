@@ -33,7 +33,7 @@ public class background {
             ys[i] = random.nextInt(Gdx.graphics.getHeight());
             st[i] = random.nextInt(3);
             brightness[i] = random.nextFloat();
-            speed[i] = random.nextFloat();
+           // speed[i] = random.nextFloat();
         }
     }
 
